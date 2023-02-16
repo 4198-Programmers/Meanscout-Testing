@@ -10,7 +10,7 @@ struct Cli {
    count: u8,
 
    /// Change the link if needed
-   #[arg(short, long, default_value="https://data.team4198.org:8000/scouting")]
+   #[arg(short, long, default_value="https://data.team4198.org:8000/test")]
    link: String,
 
    /// Password to be used with API
