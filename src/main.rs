@@ -5,10 +5,6 @@ mod requests;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// Number of times to do
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
-
     /// Change the link if needed
     #[arg(short, long, default_value="https://data.team4198.org:8000/test")]
     link: String,
