@@ -5,17 +5,25 @@ mod requests;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-   /// Number of times to do
-   #[arg(short, long, default_value_t = 1)]
-   count: u8,
+    /// Number of times to do
+    #[arg(short, long, default_value_t = 1)]
+    count: u8,
 
-   /// Change the link if needed
-   #[arg(short, long, default_value="https://data.team4198.org:8000/test")]
-   link: String,
+    /// Change the link if needed
+    #[arg(short, long, default_value="https://data.team4198.org:8000/test")]
+    link: String,
 
-   /// Password to be used with API
-   #[arg(short, long, default_value="ChangeMe!")]
-   password: String,
+    /// Whether you want it to be full matches or not
+    #[arg(short, long)]
+    matches: bool,
+
+    /// How Many points you need taken, If matches is true then it will do that many matches
+    #[arg(short, long, default_value_t=1)]
+    points: u8,
+
+    /// Password to be used with API
+    #[arg(long, default_value="ChangeMe!")]
+    password: String,
 
 //    #[command(subcommand)]
 //     command: Option<Commands>,
@@ -37,16 +45,12 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
-
-    for _i in 0..args.count {
-        let request = requests::post_data(&args.link, &args.password);
-        if request.is_ok() {
-            println!("it worked");
-        }
-        else {
-            println!("Something went wrong");
-            break
-        }
+        let request = requests::post_data(&args.link, &args.password, args.matches.clone(), args.points.clone());
+    if request.is_ok() {
+        println!("it worked");
+    }
+    else {
+        println!("Something went wrong");
     }
     
     // This is just some testing with commands

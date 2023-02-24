@@ -2,10 +2,37 @@ use reqwest;
 use rand::{self, Rng};
 use serde::{Serialize, Deserialize};
 
-pub fn post_data(link: &str, password: &str) -> Result<(), reqwest::Error> {
-    let data = TempData {
-        team: random_number(1, 10000).to_string(),
-        matchnum: random_number(1, 100).to_string(),
+pub fn post_data(link: &str, password: &str, matches: bool, points: u8) -> Result<(), reqwest::Error> {
+    let client = reqwest::blocking::Client::new();
+    if matches == true {
+        let mut randomdata: TempData;
+        for i in 1..points+1 {
+            for _e in 0..6 {
+                randomdata = random_data(password, i.into());
+                let res = client.post(link).json(&randomdata).send()?;
+                println!("{}", res.status());
+            }
+        }
+    }
+    else {
+        for i in 1..points {
+            let data = random_data(password, random_number(1, 100));
+
+            // let client = reqwest::blocking::Client::new();
+            let _res = client.post(link).json(&data).send()?;
+        }
+    }
+    
+    // println!("{}", res.as_ref().);
+    // println!("{}", res.status());
+    Ok(())
+
+}
+
+pub fn random_data(password: &str, matchnum: i64) -> TempData {
+    TempData {
+        team: random_number(1, 20).to_string(),
+        matchnum: matchnum.to_string(),
         absent: false,
         name: "Test".to_string(),
         location: "Red 1".to_string(),
@@ -40,13 +67,7 @@ pub fn post_data(link: &str, password: &str) -> Result<(), reqwest::Error> {
         driveteamrati: "They sure drove".into(),
         playstylesumm: "Something".into(),
         password: password.into(),
-    };
-
-    let client = reqwest::blocking::Client::new();
-    let res = client.post(link).json(&data).send()?;
-    // println!("{}", res.as_ref().);
-    println!("{}", res.status());
-    Ok(())
+    }
 
 }
 
@@ -70,7 +91,7 @@ pub fn random_bool() -> bool {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct TempData {
+pub struct TempData {
     pub team: String,
     pub matchnum: String,
     pub absent: bool,
