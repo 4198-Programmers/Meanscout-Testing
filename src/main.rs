@@ -1,4 +1,4 @@
-use clap::{Args, Parser, Subcommand};
+use clap::{Parser};
 mod requests;
 
 /// Program to test the Meanscout API

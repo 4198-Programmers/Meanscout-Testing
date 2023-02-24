@@ -15,7 +15,7 @@ pub fn post_data(link: &str, password: &str, matches: bool, points: u8) -> Resul
         }
     }
     else {
-        for i in 1..points {
+        for _i in 1..points+1 {
             let data = random_data(password, random_number(1, 100));
 
             // let client = reqwest::blocking::Client::new();
