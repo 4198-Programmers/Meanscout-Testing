@@ -43,6 +43,7 @@ fn main() {
     let args = Cli::parse();
         let request = requests::post_data(&args.link, &args.password, args.matches.clone(), args.points.clone());
     if request.is_ok() {
+        request;
         println!("it worked");
     }
     else {

@@ -6,20 +6,24 @@ pub fn post_data(link: &str, password: &str, matches: bool, points: u8) -> Resul
     let client = reqwest::blocking::Client::new();
     if matches == true {
         let mut randomdata: TempData;
+        let mut data: Data;
         for i in 1..points+1 {
             for _e in 0..6 {
-                randomdata = random_data(password, i.into());
-                let res = client.post(link).json(&randomdata).send()?;
+                randomdata = random_data(i.into());
+                data = Data{data: randomdata};
+                let res = client.post(link).json(&data).send()?;
                 println!("{}", res.status());
             }
         }
     }
     else {
         for _i in 1..points+1 {
-            let data = random_data(password, random_number(1, 100));
-
+            let data = random_data(random_number(1, 100));
+            let ndata = Data{data: data};
             // let client = reqwest::blocking::Client::new();
-            let _res = client.post(link).json(&data).send()?;
+            let res = client.post(link).json(&ndata).header("x-pass-key", password).send()?;
+            println!("{}", &res.status());
+            // println!("{}", &res.status());
         }
     }
     
@@ -29,44 +33,44 @@ pub fn post_data(link: &str, password: &str, matches: bool, points: u8) -> Resul
 
 }
 
-pub fn random_data(password: &str, matchnum: i64) -> TempData {
+pub fn random_data(matchnum: i64) -> TempData {
     TempData {
-        team: random_number(1, 20).to_string(),
-        matchnum: matchnum.to_string(),
-        absent: false,
-        name: "Test".to_string(),
-        location: "Red 1".to_string(),
-        teamleftcommu: random_bool(),
-        teamcollected: random_bool(),
-        autochargesta: random_bool(),
-        topcubes: random_number(0, 10),
-        middlecubes: random_number(0, 10),
-        bottomcubes: random_number(0, 10),
-        missedcubes: random_number(0, 10),
-        topcones: random_number(0, 10),
-        middlecones: random_number(0, 10),
-        bottomcones: random_number(0, 10),
-        missedcones: random_number(0, 10),
+        team: DataString {content: random_number(1, 2000).to_string(), category: "Category".into()},
+        matchnum: DataString{content: matchnum.to_string(), category: "Category".into()},
+        absent: DataBool{content: false, category: "Team".into()},
+        name: DataString {content: "Test".to_string(), category: "ACategory".into()},
+        location: DataString {content: "Red 1".to_string(), category: "Category".into()},
+        teamleftcommu: DataBool{ content: random_bool(), category: "Category".into()},
+        teamcollected: DataBool { content: random_bool(), category: "Category".into()},
+        autochargesta: DataString { content: "yeah".into(), category: "Category".into()},
+        topcubes: DataInt {content: random_number(0, 10), category: "Points".into()},
+        middlecubes: DataInt {content: random_number(0, 10), category: "Points".into()},
+        bottomcubes: DataInt {content: random_number(0, 10), category: "Points".into()},
+        missedcubes: DataInt {content: random_number(0, 10), category: "Points".into()},
+        topcones: DataInt {content: random_number(0, 10), category: "Points".into()},
+        middlecones: DataInt {content: random_number(0, 10), category: "Points".into()},
+        bottomcones: DataInt {content: random_number(0, 10), category: "Points".into()},
+        missedcones: DataInt {content: random_number(0, 10), category: "Points".into()},
 
-        topcube: random_number(0, 10),
-        middlecube: random_number(0, 10),
-        bottomcube: random_number(0, 10),
-        missedcube: random_number(0, 10),
-        topcone: random_number(0, 10),
-        middlecone: random_number(0, 10),
-        bottomcone: random_number(0, 10),
-        missedcone: random_number(0, 10),
-        defenceplayti: random_float(0.0, 20.0),
-        defensiverati: random_number(0, 6),
-        teamattemptsc: random_bool(),
-        chargestation: "Who knows".into(),
-        links: random_number(0, 7),
-        anyrobotprobl: "Absolutely".into(),
-        fouls: "Not much".into(),
-        extranotes: "White Woman Jumpscare!".into(),
-        driveteamrati: "They sure drove".into(),
-        playstylesumm: "Something".into(),
-        password: password.into(),
+        topcube: DataInt {content: random_number(0, 10), category: "Points".into()},
+        middlecube: DataInt {content: random_number(0, 10), category: "Points".into()},
+        bottomcube: DataInt {content: random_number(0, 10), category: "Points".into()},
+        missedcube: DataInt {content: random_number(0, 10), category: "Points".into()},
+        topcone: DataInt {content: random_number(0, 10), category: "Points".into()},
+        middlecone: DataInt {content: random_number(0, 10), category: "Points".into()},
+        bottomcone: DataInt {content: random_number(0, 10), category: "Points".into()},
+        missedcone: DataInt {content: random_number(0, 10), category: "Points".into()},
+        defenseplayti: DataFloat { content: random_float(0.0, 20.0), category: "Category".into()},
+        defensiverati: DataInt { content: random_number(0, 6), category: "Category".into()},
+        teamattemptsc: DataBool { content: random_bool(), category: "Category".into()},
+        chargestation: DataString { content: "Who knows".into(), category: "Category".into()},
+        links: DataInt { content: random_number(0, 7), category: "Category".into()},
+        anyrobotprobl: DataString { content: "Absolutely".into(), category: "Category".into()},
+        fouls: DataString { content: "Not much".into(), category: "Category".into()},
+        extranotes: DataString { content: "White Woman Jumpscare!".into(), category: "Category".into()},
+        driveteamrati: DataString { content: "They sure drove".into(), category: "Category".into()},
+        playstylesumm: DataString { content: "Something".into(), category: "Category".into()},
+        // password: password.into(),
     }
 
 }
@@ -91,40 +95,69 @@ pub fn random_bool() -> bool {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct DataString {
+    pub content: String,
+    pub category: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DataInt {
+    pub content: i64,
+    pub category: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DataFloat {
+    pub content: f64,
+    pub category: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DataBool {
+    pub content: bool,
+    pub category: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Data {
+    pub data: TempData,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TempData {
-    pub team: String,
-    pub matchnum: String,
-    pub absent: bool,
-    pub name: String,
-    pub location: String,
-    pub teamleftcommu: bool,
-    pub teamcollected: bool,
-    pub autochargesta: bool,
-    pub topcubes: i64,
-    pub middlecubes: i64,
-    pub bottomcubes: i64,
-    pub missedcubes: i64,
-    pub topcones: i64,
-    pub middlecones: i64,
-    pub bottomcones: i64,
-    pub missedcones: i64,
-    pub topcube: i64,
-    pub middlecube: i64,
-    pub bottomcube: i64,
-    pub missedcube: i64,
-    pub topcone: i64,
-    pub middlecone: i64,
-    pub bottomcone: i64,
-    pub missedcone: i64,
-    pub defenceplayti: f64,
-    pub defensiverati: i64,
-    pub teamattemptsc: bool,
-    pub chargestation: String,
-    pub links: i64,
-    pub anyrobotprobl: String,
-    pub fouls: String,
-    pub extranotes: String,
-    pub driveteamrati: String,
-    pub playstylesumm: String,
-    pub password: String,
+    pub team: DataString,
+    pub matchnum: DataString,
+    pub absent: DataBool,
+    pub name: DataString,
+    pub location: DataString,
+    pub teamleftcommu: DataBool,
+    pub teamcollected: DataBool,
+    pub autochargesta: DataString,
+    pub topcubes: DataInt,
+    pub middlecubes: DataInt,
+    pub bottomcubes: DataInt,
+    pub missedcubes: DataInt,
+    pub topcones: DataInt,
+    pub middlecones: DataInt,
+    pub bottomcones: DataInt,
+    pub missedcones: DataInt,
+    pub topcube: DataInt,
+    pub middlecube: DataInt,
+    pub bottomcube: DataInt,
+    pub missedcube: DataInt,
+    pub topcone: DataInt,
+    pub middlecone: DataInt,
+    pub bottomcone: DataInt,
+    pub missedcone: DataInt,
+    pub defenseplayti: DataFloat,
+    pub defensiverati: DataInt,
+    pub teamattemptsc: DataBool,
+    pub chargestation: DataString,
+    pub links: DataInt,
+    pub anyrobotprobl: DataString,
+    pub fouls: DataString,
+    pub extranotes: DataString,
+    pub driveteamrati: DataString,
+    pub playstylesumm: DataString,
+    // pub password: String,
 }
